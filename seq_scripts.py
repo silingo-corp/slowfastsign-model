@@ -110,6 +110,23 @@ def seq_eval(cfg, loader, model, device, mode, epoch, work_dir, recoder,
     return lstm_ret
 
 
+def seq_inference(vid, vid_lgt, model, device, recoder):
+    model.eval()
+    recoder.record_timer("device")
+
+    vid = device.data_to_device(vid)
+    vid_lgt = device.data_to_device(vid_lgt)
+    with torch.no_grad():
+        ret_dict = model(vid, vid_lgt, label=None, label_lgt=None)
+    total_sent = ret_dict['recognized_sents']
+
+    recoder.print_log('Output: {}'.format(ret_dict))
+    recoder.print_log('Output glosses: {}'.format(total_sent))
+
+    del vid
+    del vid_lgt
+
+
 def seq_feature_generation(loader, model, device, mode, work_dir, recoder):
     model.eval()
 
