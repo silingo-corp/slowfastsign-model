@@ -127,6 +127,23 @@ def seq_inference(vid, vid_lgt, model, device, recoder):
     del vid_lgt
 
 
+def seq_convert(vid, vid_lgt, model, device, work_dir, recoder):
+    model.eval()
+    recoder.record_timer("device")
+
+    vid = device.data_to_device(vid)
+    vid_lgt = device.data_to_device(vid_lgt)
+    args = (vid, vid_lgt, None, None,)
+
+    input_names = [ "x", "len_x", "label", "len_label" ]
+    output_names = [ "output" ]
+
+    torch.onnx.export(model, args, f"{work_dir}/model.onnx", verbose=True, input_names=input_names, output_names=output_names)
+
+    del vid
+    del vid_lgt
+
+
 def seq_feature_generation(loader, model, device, mode, work_dir, recoder):
     model.eval()
 
